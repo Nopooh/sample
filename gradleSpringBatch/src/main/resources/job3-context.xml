@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<description>Example job to get you started. It provides a skeleton for a typical batch application.</description>
+
+
+	<import resource="classpath:/launch-context.xml" />
+
+	<batch:job id="job1" job-repository="jobRepository">
+		<batch:listeners>
+			<batch:listener ref="CommonListener3"/>
+		</batch:listeners>
+		<batch:step id="step1"  >
+			<batch:tasklet transaction-manager="transactionManager" start-limit="100" >
+				<batch:chunk reader="csvFileReader" writer="csvFileWriter" commit-interval="1" />
+			</batch:tasklet>
+			<batch:listeners>
+				<batch:listener ref="CommonListener3"/>
+			</batch:listeners>
+		</batch:step>
+	</batch:job>
+
+	<!-- readerの設定 -->
+	<bean id="csvFileReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<property name="resource" value="file:#{jobParameters[infile]}" />
+		<property name="encoding" value="${app.file.reader.encoding}"/>
+		<property name="strict" value="${app.file.reader.strict}"/>
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names" value="${app.job1.file.input.header}" />
+						<property name="delimiter" value="${app.file.reader.delimiter}" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="com.sample.gradle.springbatch.job1.mapper.CommonFieldSetMapper"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- writerの設定 -->
+	<!-- scopeをstepに設定しないとEL1008Eのエラーが出るらしい。 -->
+	<bean id="csvFileWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+		<property name="resource" value="file:#{jobParameters[outfile]}" />
+		<property name="encoding" value="${app.file.writer.encoding}" />
+		<property name="appendAllowed" value="${app.file.writer.appendAllowed}" />
+		<property name="shouldDeleteIfExists" value="${app.file.writer.shouldDeleteIfExists}" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="${app.file.writer.delimiter}"/>
+				<property name="fieldExtractor">
+					<bean class="com.sample.gradle.springbatch.job1.writer.CommonEntityFieldExtractor">
+						<property name="names" value="${app.job1.file.input.header}" />
+						<!--
+						<property name="names" value="id,name,age" />
+						-->
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="CommonListener" class="com.sample.gradle.springbatch.common.JobListener" />
+
+	<bean id="CommonListener3" class="com.sample.gradle.springbatch.common.JobListener">
+		<property name="jobName" value="step3"/>
+	</bean>
+
+</beans>

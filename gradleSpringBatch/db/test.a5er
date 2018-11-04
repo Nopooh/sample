@@ -1,0 +1,154 @@
+﻿# A5:ER FORMAT:11
+# A5:ER ENCODING:UTF8
+# A5:ER Mk-1 Copyright (C)2007 m.matsubara
+# A5:SQL Mk-2 Copyright (C)1997 m.matsubara
+#  http://www.wind.sannet.ne.jp/m_matsu/developer/a5m2/
+
+[Manager]
+ProjectName=GradleTest
+Author=Nopooh
+MaxEntityRowShow=1000
+ReadOnlyRecommend=0
+Page=Main
+PageInfo="Main",2,"A3Landscape",$FFFFFF
+Domain=user_id=@VARCHAR(50)
+Domain=mng_number=@CHAR(10)
+Domain=name=@VARCHAR(60)
+Domain=password=@VARCHAR(16)
+Domain=func_id=@CHAR(10)
+Domain=family_name=@VARCHAR(25)
+Domain=first_name=@VARCHAR(25)
+Domain=postal_code=@VARCHAR(7)
+Domain=revision_number=@DECIMAL(8)
+Domain=code=@CHAR(1)
+Domain=phone_number=@CHAR(15)
+Domain=address=@VARCHAR(300)
+Domain=birth_date=@VARCHAR(8)
+Domain=mail_address=@VARCHAR(255)
+Domain=age=@VARCHAR(3)
+LogicalView=1
+DecodeDomain=0
+ViewModePageIndividually=1
+ViewMode=2
+ViewFormat=0
+UseNondependenceDashLine=0
+FontName=ＭＳ 明朝
+FontSize=9
+PaperSize=A4Landscape
+HeaderLeft=
+HeaderCenter=
+HeaderRight=
+FooterLeft=
+FooterCenter=
+FooterRight=
+ShowPageoutRelation=1
+RDBMSType=4
+RDBMSTypeName=Microsoft SQL Server 2008
+GenerateDropTableStatement=1
+DropTableIfExists=0
+CommonField="登録ユーザ管理番号","reg_user_mng_number","*mng_number","NOT NULL",,"","",$FFFFFFFF
+CommonField="登録日","reg_date","@DATETIME","NOT NULL",,"","",$FFFFFFFF
+CommonField="登録機能ID","reg_func_ID","*func_id","NOT NULL",,"","",$FFFFFFFF
+CommonField="更新ユーザ管理番号","update_user_mng_number","*mng_number","NOT NULL",,"","",$FFFFFFFF
+CommonField="更新日","update_date","@DATETIME","NOT NULL",,"","",$FFFFFFFF
+CommonField="更新機能ID","update_func_ID","*func_id","NOT NULL",,"","",$FFFFFFFF
+DefaultPkName=%0:s_PKC
+DefaultPkIndexName=%0:s_PKI
+DefaultIndexName=%0:s_IX%1:d
+DefaultFkName=%0:s_FK%1:d
+SqlSeparator=0
+ShowTag=1
+ShowCommonAttributes=1
+
+[Relation]
+Entity1=t_user_info
+Entity2=h_user_info
+RelationType1=2
+RelationType2=3
+Fields1=user_mng_number,revision_number
+Fields2=user_mng_number,revision_number
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,2052,5199,1451,R,R
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20181028162035
+LineMode=0
+Bar1=205
+Bar2=520
+Bar3=145
+TermPos1=R
+TermPos2=R
+
+[Entity]
+PName=h_user_info
+LName=ユーザ情報履歴
+Comment=
+TableOption=
+Page=Main
+Left=850
+Top=100
+Field="ユーザ管理番号","user_mng_number","*mng_number","NOT NULL",0,"","",$000000FF,""
+Field="版数","revision_number","*revision_number","NOT NULL",1,"","",$FFFFFFFF,""
+Field="ユーザID","user_id","*user_id","NOT NULL",,"","",$FFFFFFFF,""
+Field="パスワード","password","*password","NOT NULL",,"","",$FFFFFFFF,""
+Field="ユーザ表示名","user_disp_name","*name","NOT NULL",,"","",$FFFFFFFF,""
+Field="姓（漢字）","kanji_family_name","*family_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="名（漢字）","kanji_first_name","*first_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="姓（カナ）","kana_family_name","*family_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="名（カナ）","kana_first_name","*first_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="メールアドレス","mail_address","*mail_address","NOT NULL",,"","",$FFFFFFFF,""
+Field="郵便番号","postal_code","*postal_code","NOT NULL",,"","",$FFFFFFFF,""
+Field="住所（漢字）","address","*address","NOT NULL",,"","",$FFFFFFFF,""
+Field="住所（ローマ字）","address_romaji","*address",,,"","",$FFFFFFFF,""
+Field="生年月日","birth_date","*birth_date",,,"","",$FFFFFFFF,""
+Field="年齢","age","*age",,,"","",$FFFFFFFF,""
+Field="性別","sex","*code",,,"","",$FFFFFFFF,""
+Field="電話番号","phone_number","*phone_number",,,"","",$FFFFFFFF,""
+Field="携帯番号","cellphone_number","*phone_number",,,"","",$FFFFFFFF,""
+Field="FAX","fax_number","*phone_number",,,"","",$FFFFFFFF,""
+Field="履歴登録ユーザ管理番号","history_reg_user_mng_number","*mng_number","NOT NULL",,"","",$FFFFFFFF,""
+Field="履歴登録日","history_reg_date","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+Field="履歴登録機能ID","history_reg_func_ID","*func_id","NOT NULL",,"","",$FFFFFFFF,""
+Field="履歴更新ユーザ管理番号","history_update_user_mng_number","*mng_number","NOT NULL",,"","",$FFFFFFFF,""
+Field="履歴更新日","history_update_date","@DATETIME","NOT NULL",,"","",$FFFFFFFF,""
+Field="履歴更新機能ID","history_update_func_ID","*func_id","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20181028184617
+Position="Main",850,100,439,1169
+
+[Entity]
+PName=t_user_info
+LName=ユーザ情報
+Comment=
+TableOption=
+Page=MAIN
+Left=100
+Top=100
+Field="ユーザ管理番号","user_mng_number","*mng_number","NOT NULL",0,"","",$000000FF,""
+Field="版数","revision_number","*revision_number","NOT NULL",,"","",$FFFFFFFF,""
+Field="ユーザID","user_id","*user_id","NOT NULL",,"","",$FFFFFFFF,""
+Field="パスワード","password","*password","NOT NULL",,"","",$FFFFFFFF,""
+Field="ユーザ表示名","user_disp_name","*name","NOT NULL",,"","",$FFFFFFFF,""
+Field="姓（漢字）","kanji_family_name","*family_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="名（漢字）","kanji_first_name","*first_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="姓（カナ）","kana_family_name","*family_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="名（カナ）","kana_first_name","*first_name","NOT NULL",,"","",$FFFFFFFF,""
+Field="メールアドレス","mail_address","*mail_address","NOT NULL",,"","",$FFFFFFFF,""
+Field="郵便番号","postal_code","*postal_code","NOT NULL",,"","",$FFFFFFFF,""
+Field="住所（漢字）","address","*address","NOT NULL",,"","",$FFFFFFFF,""
+Field="住所（ローマ字）","address_romaji","*address",,,"","",$FFFFFFFF,""
+Field="生年月日","birth_date","*birth_date",,,"","",$FFFFFFFF,""
+Field="年齢","age","*age",,,"","",$FFFFFFFF,""
+Field="性別","sex","*code",,,"","",$FFFFFFFF,""
+Field="電話番号","phone_number","*phone_number",,,"","",$FFFFFFFF,""
+Field="携帯番号","cellphone_number","*phone_number",,,"","",$FFFFFFFF,""
+Field="FAX","fax_number","*phone_number",,,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20181028184555
+Position="MAIN",100,100,439,900

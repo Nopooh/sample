@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+
+	<context:annotation-config/>
+
+	<context:property-placeholder location="classpath:batch.properties,classpath:Application.properties" />
+
+	<context:component-scan base-package="com.sample.gradle.springbatch.common
+	                                     ,com.sample.gradle.springbatch.job*.entity
+	                                     ,com.sample.gradle.springbatch.job*.mapper
+	                                     ,com.sample.gradle.springbatch.job*.processor
+	                                     ,com.sample.gradle.springbatch.job*.reader
+	                                     ,com.sample.gradle.springbatch.job*.writer
+	                                     " />
+
+	<batch:job-repository id="jobRepository" />
+
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+		<property name="jobLauncher" ref="jobLauncher"/>
+		<property name="jobExplorer" ref="jobExplorer"/>
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="maxVarCharLength" value="2000"/>
+		<property name="isolationLevelForCreate" value="ISOLATION_SERIALIZABLE"/>
+	</bean>
+
+
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${batch.jdbc.driver}"/>
+		<property name="url" value="${batch.jdbc.url}"/>
+		<property name="username" value="${batch.jdbc.user}"/>
+		<property name="password" value="${batch.jdbc.password}"/>
+		<property name="maxTotal" value="10"/>
+		<property name="minIdle" value="1"/>
+		<property name="maxWaitMillis" value="5000"/>
+		<property name="defaultAutoCommit" value="false"/>
+	</bean>
+
+	<!-- トランザクション管理の設定 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+		<property name="dataSource" ref="dataSource" />
+		<property name="rollbackOnCommitFailure" value="true"/>
+	</bean>
+
+	<!-- MyBatis3とSpringの連携設定 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>
+		<property name="mapperLocations" value="classpath*:com/sample/gradle/springbatch/common/**/*.xml"/>
+	</bean>
+	<bean id="batchSqlSession" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg index="0" ref="sqlSessionFactory"/>
+		<constructor-arg index="1" value="REUSE"/>
+	</bean>
+
+</beans>

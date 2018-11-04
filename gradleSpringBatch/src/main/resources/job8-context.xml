@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+	<description>Example job to get you started. It provides a skeleton for a typical batch application.</description>
+
+
+	<import resource="classpath:/launch-context.xml" />
+
+	<mybatis:scan base-package="com.sample.gradle.springbatch.common.mapper"
+	              factory-ref="sqlSessionFactory"
+	 />
+
+	<!--
+	<bean id="UsersMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.sample.gradle.springbatch.common.mapper.UsersMapper"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	-->
+	<batch:job id="job8" job-repository="jobRepository">
+		<batch:listeners>
+			<batch:listener ref="CommonListener"/>
+		</batch:listeners>
+		<batch:step id="step1"  >
+			<batch:tasklet transaction-manager="transactionManager" start-limit="100" >
+				<batch:chunk reader="DbReader" writer="csvFileWriter" commit-interval="10000" />
+				<batch:listeners>
+					<batch:listener ref="ReaderStepListener"/>
+				</batch:listeners>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<!-- readerの設定 -->
+	<bean id="DbReader" class="org.mybatis.spring.batch.MyBatisCursorItemReader" scope="step">
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	<!-- 見直し箇所-->
+		<property name="queryId" value="com.sample.gradle.springbatch.common.mapper.UsersMapper.selectUsersP"/>
+		<property name="parameterValues" ref="readerParams" />
+	</bean>
+
+	<!-- util使用するためには以下の宣下が必要 -->
+	<!-- xmlns:util="http://www.springframework.org/schema/util" -->
+	<!-- xsi:schemaLocation=http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd" -->
+	<util:map id="readerParams" scope="step">
+		<entry key="id" value="#{stepExecutionContext['inId']}" />
+	</util:map>
+
+	<!-- writerの設定 -->
+	<!-- scopeをstepに設定しないとEL1008Eのエラーが出るらしい。 -->
+	<bean id="csvFileWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+		<property name="resource" value="file:#{jobParameters[outfile]}-5.csv" />
+		<property name="encoding" value="${app.file.writer.encoding}" />
+		<property name="appendAllowed" value="${app.file.writer.appendAllowed}" />
+		<property name="shouldDeleteIfExists" value="${app.file.writer.shouldDeleteIfExists}" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="${app.file.writer.delimiter}"/>
+				<property name="fieldExtractor">
+					<bean class="com.sample.gradle.springbatch.job1.writer.UserEntityFieldExtractor">
+						<!--
+						<property name="names" value="${app.job1.file.input.header}" />
+						<property name="names" value="id,name,age" />
+						-->
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="CommonListener" class="com.sample.gradle.springbatch.common.JobListener"/>
+	<bean id="ReaderStepListener" class="com.sample.gradle.springbatch.job8.reader.ReaderStepListener" scope="step">
+		<property name="jobName" value="step"/>
+	</bean>
+</beans>
